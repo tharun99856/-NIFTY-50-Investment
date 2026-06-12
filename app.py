@@ -106,7 +106,7 @@ def main():
             st.subheader("Price Trends")
             fig = px.line(plot_df, x="Date", y="Close", color="Symbol", title="Closing Price Over Time")
             fig.update_layout(height=450)
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width="stretch")
 
             col1, col2 = st.columns(2)
             with col1:
@@ -126,7 +126,7 @@ def main():
                         fig_vol.add_trace(go.Scatter(x=sdf["Date"], y=sdf["Rolling_Vol_30"],
                                                       name=sym, mode="lines"))
                 fig_vol.update_layout(height=350, title="30-Day Rolling Volatility")
-                st.plotly_chart(fig_vol, use_container_width=True)
+                st.plotly_chart(fig_vol, width="stretch")
 
             st.subheader("Return Distributions")
             fig_dist = make_subplots(rows=1, cols=min(3, len(selected_eda)),
@@ -138,7 +138,7 @@ def main():
                     fig_dist.add_trace(go.Histogram(x=returns, nbinsx=80, name=sym,
                                                       showlegend=False), row=1, col=i + 1)
             fig_dist.update_layout(height=350, title="Daily Return Distributions")
-            st.plotly_chart(fig_dist, use_container_width=True)
+            st.plotly_chart(fig_dist, width="stretch")
 
             st.subheader("Correlation Heatmap")
             pivot_close = raw_df[raw_df["Symbol"].isin(selected_eda)].pivot_table(
@@ -148,7 +148,7 @@ def main():
             fig_corr = px.imshow(corr_matrix, text_auto=".2f", color_continuous_scale="RdBu_r",
                                   title="Return Correlation Matrix")
             fig_corr.update_layout(height=500)
-            st.plotly_chart(fig_corr, use_container_width=True)
+            st.plotly_chart(fig_corr, width="stretch")
 
     with tab_regime:
         st.header("Market Regime Detection")
@@ -176,24 +176,24 @@ def main():
 
         fig_regime.update_layout(height=500, title="NIFTY-50 Index with Detected Market Regimes",
                                   xaxis_title="Date", yaxis_title="Index Level (avg close)")
-        st.plotly_chart(fig_regime, use_container_width=True)
+        st.plotly_chart(fig_regime, width="stretch")
 
         col1, col2 = st.columns(2)
         with col1:
             st.subheader("Regime Summary Statistics")
-            st.dataframe(regime_summ.style.format("{:.4f}"), use_container_width=True)
+            st.dataframe(regime_summ.style.format("{:.4f}"), width="stretch")
 
         with col2:
             st.subheader("Regime Transition Matrix")
             trans = regime_transition_matrix(regimes)
             st.dataframe(trans.style.format("{:.3f}").background_gradient(cmap="YlOrRd"),
-                         use_container_width=True)
+                         width="stretch")
         st.subheader("Regime Duration Distribution")
         from src.regime import get_regime_periods
         periods = get_regime_periods(regimes)
         fig_dur = px.histogram(periods, x="Days", color="Regime", barmode="overlay",
                                 title="Duration of Regime Periods (days)")
-        st.plotly_chart(fig_dur, use_container_width=True)
+        st.plotly_chart(fig_dur, width="stretch")
 
     with tab_predict:
         st.header("Stock Prediction Engine")
@@ -237,7 +237,7 @@ def main():
 
                 metrics_df = pd.DataFrame(metrics_rows)
                 st.dataframe(metrics_df.style.format("{:.4f}", subset=metrics_df.columns[1:]),
-                             use_container_width=True)
+                             width="stretch")
 
                 for sym, r in results.items():
                     fig_pred = go.Figure()
@@ -250,7 +250,7 @@ def main():
                                                     mode="lines", name="Baseline", line=dict(color="red", dash="dash")))
                     fig_pred.update_layout(title=f"{sym} — Actual vs Predicted (Test Set)",
                                             height=400)
-                    st.plotly_chart(fig_pred, use_container_width=True)
+                    st.plotly_chart(fig_pred, width="stretch")
 
                     try:
                         import shap
@@ -270,7 +270,7 @@ def main():
                                            title=f"{sym} — Feature Importance (SHAP)",
                                            labels={"x": "Mean |SHAP|", "y": "Feature"})
                         fig_shap.update_layout(height=350, yaxis=dict(autorange="reversed"))
-                        st.plotly_chart(fig_shap, use_container_width=True)
+                        st.plotly_chart(fig_shap, width="stretch")
                     except Exception:
                         pass
 
@@ -349,7 +349,7 @@ def main():
                 fig_sectors.add_trace(go.Bar(name=pname, x=all_sectors, y=vals))
             fig_sectors.update_layout(barmode="group", title="Sector Weights by Portfolio",
                                        yaxis_title="Weight", height=400)
-            st.plotly_chart(fig_sectors, use_container_width=True)
+            st.plotly_chart(fig_sectors, width="stretch")
 
         st.subheader("Regime-Conditional Portfolios")
         regime_ports = build_regime_portfolios(pivot_ret, regimes.reindex(pivot_ret.index).ffill().dropna())
@@ -383,7 +383,7 @@ def main():
                 risk_table.style.format("{:.4f}")
                 .background_gradient(subset=["Sharpe_Ratio"], cmap="RdYlGn")
                 .background_gradient(subset=["Max_Drawdown"], cmap="RdYlGn_r"),
-                use_container_width=True,
+                width="stretch",
             )
 
             st.subheader("Anomaly Detection (>3σ events)")
@@ -403,7 +403,7 @@ def main():
                                                     marker=dict(color="red", size=8)))
                     fig_anom.update_layout(title=f"{anomaly_sym} — Price with Anomalous Return Days",
                                             height=400)
-                    st.plotly_chart(fig_anom, use_container_width=True)
+                    st.plotly_chart(fig_anom, width="stretch")
                     st.caption(f"{len(anomalies)} anomalous days detected.")
                 else:
                     st.info("No anomalies detected at 3σ threshold.")
@@ -414,7 +414,7 @@ def main():
                 for pname, (p, perf) in portfolios.items():
                     port_risk_rows.append({"Portfolio": pname, **perf})
                 port_risk_df = pd.DataFrame(port_risk_rows).set_index("Portfolio")
-                st.dataframe(port_risk_df.style.format("{:.4f}"), use_container_width=True)
+                st.dataframe(port_risk_df.style.format("{:.4f}"), width="stretch")
 
     with tab_explain:
         st.header("Explainability")
@@ -444,7 +444,7 @@ def main():
             regime_aligned,
         )
         st.dataframe(sector_rot.style.format("{:.4f}").background_gradient(cmap="RdYlGn", axis=None),
-                     use_container_width=True)
+                     width="stretch")
 
         if portfolios:
             st.subheader("Portfolio Rationale")
