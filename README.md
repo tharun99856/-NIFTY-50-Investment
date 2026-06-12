@@ -1,3 +1,6 @@
+# Working Prototype (Live Deployment)
+https://niftyinvest.streamlit.app/
+(Website might be slow, due to the limitations of free tier.)
 # NIFTY-50 Investment Intelligence Platform
 
 Investment analysis tool built on NIFTY-50 historical data (Jan 2000 - Apr 2021). Uses a Hidden Markov Model to detect market regimes (Bull/Bear/Sideways) and adapts predictions, portfolios, and risk metrics based on the current state.
